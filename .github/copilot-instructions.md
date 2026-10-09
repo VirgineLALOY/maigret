@@ -87,7 +87,8 @@ make intl-update LANG=fr
 The repo uses a local git hook path:
 
 ```bash
-git config --local core.hooksPath .githooks/
+git config --lo
+cal core.hooksPath .githooks/
 ```
 
 This hook regenerates `maigret/resources/db_meta.json` and `sites.md` for site-database changes and stages those generated files with the commit. Run `git commit` from inside the repo so the hook can fire.

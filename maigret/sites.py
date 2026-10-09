@@ -17,7 +17,11 @@ class MaigretEngine:
 
     def __init__(self, name, data):
         self.name = name
-        self.__dict__.update(data)
+        self.__dict__.update(copy.deepcopy(data))
+        if "site" not in self.__dict__:
+            self.site = {}
+        else:
+            self.site = copy.deepcopy(self.site)
 
     @property
     def json(self):
@@ -114,17 +118,36 @@ class MaigretSite:
     def __init__(self, name, information):
         self.name = name
         self.url_subpath = ""
+
+        for field_name in (
+            "tags",
+            "headers",
+            "errors",
+            "activation",
+            "request_payload",
+            "get_params",
+            "presense_strs",
+            "absence_strs",
+            "stats",
+            "engine_data",
+            "protection",
+            "mirrors",
+            "unknown_fields",
+        ):
+            default_value = getattr(MaigretSite, field_name, None)
+            if isinstance(default_value, (dict, list)):
+                setattr(self, field_name, copy.deepcopy(default_value))
+            elif default_value is not None:
+                setattr(self, field_name, copy.deepcopy(default_value))
+
         self.stats = {}
-        # Fields the class does not declare are still stored, but nothing ever
-        # reads them: a typo like presenceStrs instead of presenseStrs silently
-        # turns a check off. Keep them so get_db_stats can report the entry.
-        self.unknown_fields: List[str] = []
+        self.unknown_fields = []
 
         for k, v in information.items():
             field = CaseConverter.camel_to_snake(k)
             if not hasattr(MaigretSite, field):
                 self.unknown_fields.append(k)
-            self.__dict__[field] = v
+            self.__dict__[field] = copy.deepcopy(v)
 
         # What the entry stated for itself, as opposed to what this constructor
         # synthesises (`alexa_rank` below) or an engine supplies later. Used to

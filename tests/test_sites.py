@@ -87,6 +87,22 @@ def test_site_stats_are_instance_local():
     assert 'presense_flag' not in second.stats
 
 
+def test_site_mutable_defaults_are_instance_local():
+    first = MaigretSite('First', {})
+    second = MaigretSite('Second', {})
+
+    first.headers['Authorization'] = 'token'
+    first.tags.append('forum')
+    first.presense_strs.append('profile marker')
+
+    assert first.headers is not second.headers
+    assert 'Authorization' not in second.headers
+    assert first.tags is not second.tags
+    assert 'forum' not in second.tags
+    assert first.presense_strs is not second.presense_strs
+    assert 'profile marker' not in second.presense_strs
+
+
 def test_site_default_check_type_and_engine_precedence():
     site = MaigretSite('DefaultCheck', {'urlMain': 'https://example.com'})
 
